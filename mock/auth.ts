@@ -7,7 +7,7 @@ export default [
         response: ({ body }:{body:{username:string,password:string}}) => {
             const { username, password } = body
             console.log('body', body)
-            if (username === 'admin' && password === '123456') {
+            if (username === 'admin' && password === '12345') {
                 return {
                     code: 200,
                     data: {

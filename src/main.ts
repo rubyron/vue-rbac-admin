@@ -20,3 +20,13 @@ app.use(createPinia())
 app.use(router)
 
 app.mount('#app')
+
+// const useMock = (import.meta.env.VITE_USE_MOCK ?? '').toLowerCase() === 'true'
+
+// if (useMock) {
+//   const { worker } = await import('./mocks/browser')
+//   await worker.start({
+//     onUnhandledRequest: 'bypass',
+//   })
+// }
+

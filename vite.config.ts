@@ -18,6 +18,7 @@ export default defineConfig(({command,mode})=>{
   const env = loadEnv(mode, process.cwd(), '') // 第三个参数 '' 表示不过滤前缀，全部读进来
   const isMock = (env.VITE_USE_MOCK ?? '').toLowerCase() === 'true'
   return{
+  base:'/vue-rbac-admin/',
   plugins: [
     vue(),
     vueDevTools(),
