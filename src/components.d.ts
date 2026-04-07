@@ -12,7 +12,9 @@ export {}
 declare module 'vue' {
   export interface GlobalComponents {
     BaseChart: typeof import('./components/BaseChart.vue')['default']
+    BasePermissionTree: typeof import('./components/tree/BasePermissionTree.vue')['default']
     BaseTable: typeof import('./components/table/BaseTable.vue')['default']
+    BaseTree: typeof import('./components/tree/BaseTree.vue')['default']
     ElAlert: typeof import('element-plus/es')['ElAlert']
     ElAvatar: typeof import('element-plus/es')['ElAvatar']
     ElBreadcrumb: typeof import('element-plus/es')['ElBreadcrumb']

@@ -38,11 +38,10 @@
           登录
         </el-button>
 
-        <div class="tips">
-          测试账号[full access]：admin / 123456
-        </div>
-        <div class="tips">
-          测试账号[limit access]：user / 123456
+        <div class="tips-list">
+          <div class="tips" v-for="item in testAccounts" :key="item.username">
+            测试账号[{{ item.label }}]：{{ item.username }} / 123456
+          </div>
         </div>
       </el-form>
     </div>
@@ -67,10 +66,18 @@ const formRef = ref<FormInstance | null>(null)
 const loading = ref(false)
 
 const form = reactive<LoginForm>({
-  username: 'admin',
+  username: 'root',
   password: '123456',
   remember: true,
 })
+
+const testAccounts = [
+  { label: '超级管理员', username: 'root' },
+  { label: '系统管理员', username: 'sysadmin' },
+  { label: '普通员工', username: 'employee' },
+  { label: '客服', username: 'support' },
+  { label: '工程师', username: 'engineer' },
+]
 
 const rules: FormRules<LoginForm> = {
   username: [
@@ -146,5 +153,9 @@ const onSubmit = async () => {
   font-size: 12px;
   color: #909399;
   text-align: center;
+}
+
+.tips-list {
+  margin-top: 12px;
 }
 </style>

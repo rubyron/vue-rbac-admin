@@ -39,13 +39,6 @@
             <el-tag v-if="selectedRole === 'super_admin'" type="warning" size="small">全部权限</el-tag>
           </div>
           <div class="role-perm-page__tree-tools">
-            <el-input
-              v-model="filterText"
-              placeholder="搜索权限"
-              clearable
-              :prefix-icon="Search"
-              class="role-perm-page__filter-input"
-            />
             <el-button type="primary" :disabled="selectedRole === 'super_admin'" @click="savePermissions">
               保存
             </el-button>
@@ -61,18 +54,17 @@
           title="超级管理员固定拥有全部权限，无需配置。"
         />
 
-        <el-tree
+        <BasePermissionTree
           v-if="treeData.length"
           ref="treeRef"
-          class="role-perm-page__tree"
-          :data="treeData"
+          :data="treeData as any[]"
           node-key="id"
-          show-checkbox
-          :props="treeProps"
-          :default-expand-all="true"
+          :tree-props="treeProps"
+          :all-leaf-keys="allLeafKeys"
+          :filter-text="filterText"
           :filter-node-method="filterNode"
           :disabled="selectedRole === 'super_admin'"
-          highlight-current
+          @update:filter-text="onFilterTextUpdate"
         />
         <el-empty v-else description="暂无权限树数据" />
       </el-card>
@@ -82,13 +74,13 @@
 
 <script setup lang="ts">
 import { computed, nextTick, onMounted, ref, watch } from 'vue'
-import { Search } from '@element-plus/icons-vue'
 import { ElMessage } from 'element-plus'
-import type { ElTree } from 'element-plus'
 import type { Role } from '@/mocks/handlers/rbac'
 import { allMenus, rolePermissions } from '@/mocks/handlers/rbac'
+import BasePermissionTree from '@/components/tree/BasePermissionTree.vue'
 import {
   buildPermissionTree,
+  collectAllPerms,
   computeCheckedIds,
   type PermTreeNode,
 } from '@/utils/permissionTree'
@@ -106,7 +98,7 @@ const roleOptions: { code: Role; name: string; description: string }[] = [
 const selectedRole = ref<Role>('system_admin')
 const roleKeyword = ref('')
 const filterText = ref('')
-const treeRef = ref<InstanceType<typeof ElTree>>()
+const treeRef = ref<InstanceType<typeof BasePermissionTree>>()
 
 const treeProps = { label: 'label', children: 'children' }
 
@@ -138,7 +130,19 @@ function loadMergedPermissions(): Record<Role, string[]> {
 const permByRole = ref<Record<Role, string[]>>(loadMergedPermissions())
 
 const treeData = computed<PermTreeNode[]>(() => buildPermissionTree(allMenus))
-console.log('treeData',treeData)
+const allLeafKeys = computed(() => {
+  const perms = [...collectAllPerms(treeData.value)]
+  const nodes = treeData.value
+  const ids: Array<string | number> = []
+  const walk = (list: PermTreeNode[]) => {
+    list.forEach((n) => {
+      if (n.perm && perms.includes(n.perm)) ids.push(n.id)
+      if (n.children?.length) walk(n.children)
+    })
+  }
+  walk(nodes)
+  return ids
+})
 function currentGranted(): string[] {
   return permByRole.value[selectedRole.value] ?? []
 }
@@ -160,13 +164,13 @@ watch(selectedRole, () => {
   applyCheckedKeys()
 })
 
-watch(filterText, (val) => {
-  treeRef.value?.filter(val)
-})
-
 function filterNode(value: string, data: PermTreeNode) {
   if (!value) return true
   return data.label.toLowerCase().includes(value.toLowerCase())
+}
+
+function onFilterTextUpdate(v: string) {
+  filterText.value = v
 }
 
 function savePermissions() {
