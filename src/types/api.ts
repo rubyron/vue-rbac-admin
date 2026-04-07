@@ -11,6 +11,7 @@ export interface UserInfoResI {
   id: string
   name: string
   path: string
+  redirect?: string
   icon?: string
   type?:string,
   perms?:string[]

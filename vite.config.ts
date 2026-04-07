@@ -31,10 +31,10 @@ export default defineConfig(({command,mode})=>{
       dts: 'src/auto-imports.d.ts',
       resolvers: [ElementPlusResolver()], // 同时处理 Element Plus 的 API 导入（可选）
     }),
-    viteMockServe({
-      mockPath: 'mock',
-      enable: isMock, // 开发环境开启
-    }),
+    // viteMockServe({
+    //   mockPath: 'mock',
+    //   enable: isMock, // 开发环境开启
+    // }),
   ],
   resolve: {
     alias: {

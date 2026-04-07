@@ -29,6 +29,7 @@ const isCollapse=computed(()=>{
   return !appStore.sideBarExpanded
 })
 const menuTree=computed(()=>{
+  console.log('menuTree',menuTree)
   return userStore.menuTree
 })
 const handleMenuSelect = (key: string) => {

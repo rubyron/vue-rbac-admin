@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { getUserInfo } from '@/api/user' // 假设这个接口会返回角色和权限数据
-import type { RouteRecordRaw } from 'vue-router'
+import { RouterView, type RouteRecordRaw } from 'vue-router'
 import { getRole } from '@/utils/token'
 import type {UserInfoResI, ActionI} from '@/types/api.ts'
 
@@ -10,14 +10,19 @@ const viewModules = import.meta.glob('@/views/**/*.vue')
 function resolveComponent(path?: string) {
   if (!path) return undefined
   const key = `/src/views/${path}/index.vue`
-  console.log('viewModules',key,viewModules)
+  // console.log('viewModules',key,viewModules)
   return viewModules[key] || (() => import('@/views/error/NotFound.vue'))
+}
+
+function normalizePath(path = '') {
+  return path.startsWith('/') ? path.slice(1) : path
 }
 
 function buildRoutes(tree: UserInfoResI[]): RouteRecordRaw[] {
   return tree.map(n => ({
     path: n.path,
     name: n.name,
+    redirect: n?.redirect,
     component: resolveComponent(n.component),
     meta: {
       title:n.name,
@@ -68,7 +73,7 @@ export const useUserStore = defineStore('user', () => {
     menuTree.value = res.data
     routes.value = buildRoutes(res.data)
     pagePermissionMap.value = collectPermissions(res.data)
-    console.log('permissionSet',pagePermissionMap.value)
+    // console.log('user store,',menuTree.value,routes.value,pagePermissionMap.value)
   }
 
 const clearMenuTree=()=> {

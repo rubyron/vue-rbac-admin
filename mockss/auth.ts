@@ -1,4 +1,5 @@
 import type { MockMethod } from 'vite-plugin-mock'
+import { mockUsers, getMenusByRole } from '../src/mocks/handlers/rbac'
 
 export default [
     {
@@ -6,22 +7,13 @@ export default [
         method: 'post',
         response: ({ body }:{body:{username:string,password:string}}) => {
             const { username, password } = body
-            console.log('body', body)
-            if (username === 'admin' && password === '12345') {
+            const matchedUser = mockUsers.find((user) => user.username === username && user.password === password)
+            if (matchedUser) {
                 return {
                     code: 200,
                     data: {
-                        token: 'admin-token',
-                        role:'admin'
-                    }
-                }
-            }
-            if (username === 'user' && password === '123456') {
-                return {
-                    code: 200,
-                    data: {
-                        token: 'user-token',
-                        role:'user'
+                        token: matchedUser.token,
+                        role: matchedUser.role
                     }
                 }
             }
@@ -36,14 +28,11 @@ export default [
     {
         url: '/api/user/info',
         method: 'get',
-        response: () => {
+        response: ({ query }:{query:{role?:string}}) => {
+            const role = (query.role || 'employee') as any
             return {
                 code: 200,
-                data: {
-                    name: 'Admin',
-                    roles: ['admin'],
-                    permissions: ['user:add', 'user:edit']
-                }
+                data: getMenusByRole(role)
             }
         },
     },
